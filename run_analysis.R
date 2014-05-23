@@ -7,9 +7,6 @@
 
 # Good luck!
 
-
-# I'm pretty sure test+train = full data set as described in read me. reading. it helps.
-
 # read in the datas
 trainXraw <- read.table("train/X_train.txt", header = FALSE, stringsAsFactors=FALSE)
 trainYraw <- read.table("train/y_train.txt", header = FALSE, sep = "\t", stringsAsFactors=FALSE)
@@ -32,18 +29,24 @@ links$activity <- gsub("^[0-9] ", "", links$activity)
 # read in and format the titles to be used as column headers in the above data set
 features <- read.table("features.txt", header=FALSE, sep = "\t", stringsAsFactors=FALSE)
 names(features) <- "feature"
-features$feature[555:561] <- gsub(",", "-", features$feature[555:561])
-features$feature[555:561] <- gsub("\\(", "-", features$feature[555:561])
+features$feature[555:561] <- gsub(",", ".", features$feature[555:561])
+features$feature[555:561] <- gsub("\\(", ".", features$feature[555:561])
 features$feature[555:561] <- gsub("\\)", "", features$feature[555:561])
 features$feature <- gsub("\\(\\)", "", features$feature)
+features$feature <- gsub("-", ".", features$feature)
+features$feature <- gsub(",", ".", features$feature)
 features$feature <- gsub("^[0-9]+ ", "", features$feature)
 
 #combine test and train data
-masterset <- rbind(traindata, testdata)
+mastersetraw <- rbind(traindata, testdata)
 
 # apply feature names to the data columns
-names(masterset) <- c("subject", "activity", features$feature)
+names(mastersetraw) <- c("subject", "activity", features$feature)
 
 # relabel activity codes with english name;; do this after the rbind/cbinds??
-masterset$activity <- factor(masterset$activity, labels = links$activity)
+mastersetraw$activity <- factor(mastersetraw$activity, labels = links$activity)
+
+# extract all mean and std measurements
+mastersetdata <- masterset[, grep("subject|activity|mean|std", ignore.case=TRUE, colnames(masterset))]
+
 
